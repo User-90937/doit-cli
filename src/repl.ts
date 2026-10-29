@@ -16,10 +16,13 @@ export function startREPL() {
         const command = getCommands()[parsedCommand]
         if (!command) {
             console.log(`Unknown command`)
+            rl.prompt();
         } else {
-            command.callback();
+            await command.callback();
         }
-        rl.prompt();
+        if (command.name !== "exit") {
+            rl.prompt();
+        }
     })
     
 }
