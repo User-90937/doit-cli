@@ -12,22 +12,26 @@ export const rl = readline.createInterface({
 export function startREPL() {
     rl.prompt();
     rl.on('line', async (input) => {
-        const parsedCommand = parseCommand(input);
-        const command = getCommands()[parsedCommand]
-        if (!command) {
-            console.log(`Unknown command`)
+        const parsedCommand = validateAndParseCommand(input);
+        if (parsedCommand) {
+            const baseCommand = parsedCommand[0];
+            const command = getCommands()[baseCommand];
+            await command.callback(parsedCommand[1]);
+            if (command.name !== "exit") {
             rl.prompt();
-        } else {
-            await command.callback();
         }
-        if (command.name !== "exit") {
-            rl.prompt();
         }
     })
-    
 }
 
-function parseCommand(rawCommand: string)  {
-    const parsed = rawCommand.split(' ')[0].toLowerCase().trim()
-    return parsed;
+function validateAndParseCommand(rawCommand: string): [string, string[]] | undefined  {
+    const commands = rawCommand.trim().split(' ')
+    const baseCommand = commands[0];
+    const args = [...commands.slice(1)]
+    if (!getCommands()[baseCommand]) {
+        console.log("Unkown command!\nUse the 'help' command to see all valid commands.")
+        rl.prompt()
+    } else {
+        return [baseCommand, args]
+    }
 }

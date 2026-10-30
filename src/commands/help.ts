@@ -1,7 +1,7 @@
 import { get } from "node:http";
 import { getCommands } from "../command_registry.js";
 
-export function helpCommand() {
+export async function helpCommand() {
     const commands = getCommands();
     console.log("\nCommands:\n")
     
